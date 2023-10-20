@@ -1,6 +1,7 @@
-// Importe as bibliotecas necessárias
 import Chart from 'chart.js/auto';
-import Papa from 'papaparse';
+
+
+
 
 // Seleciona os elementos do canvas
 const actorsCanvas = document.getElementById('actorsChart');
@@ -51,10 +52,10 @@ function readCSV(file, canvas) {
 }
 
 // Carregando e criando gráficos para atores e atrizes
-fetch('baseDados/oscar_age_male.csv') // Substitua pelo caminho correto para o arquivo CSV dos atores
+fetch('./baseDados/oscar_age_male.csv') // Substitua pelo caminho correto para o arquivo CSV dos atores
     .then(response => response.text())
     .then(data => readCSV(data, actorsCanvas));
 
-fetch('baseDados/oscar_age_female.csv') // Substitua pelo caminho correto para o arquivo CSV das atrizes
+fetch('./baseDados/oscar_age_female.csv') // Substitua pelo caminho correto para o arquivo CSV das atrizes
     .then(response => response.text())
     .then(data => readCSV(data, actressesCanvas));
