@@ -55,7 +55,7 @@ function readCSV(file, canvas, gender) {
 }
 
 // Carregando e criando gráficos para atores e atrizes por década
-fetch('./baseDados/oscar_age.csv') // Substitua pelo caminho correto para o arquivo CSV
+fetch('./baseDados/oscar_age_male.csv','./baseDados/oscar_age_female.csv' ) // Substitua pelo caminho correto para o arquivo CSV
     .then(response => response.text())
     .then(data => {
         readCSV(data, actorsCanvas, 'Male'); // Gráfico de atores (homens)
