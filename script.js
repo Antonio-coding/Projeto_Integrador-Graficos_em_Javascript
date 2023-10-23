@@ -1,30 +1,42 @@
-import Papa from 'papaparse';
-
-
-
-
-// Seleciona os elementos do canvas
 const actorsCanvas = document.getElementById('actorsChart');
 const actressesCanvas = document.getElementById('actressesChart');
 
 // Função para carregar dados do arquivo CSV e criar gráficos
-function createChartFromCSV(canvas, data) {
+function createDecadeChart(canvas, data, gender) {
+    const decades = Array.from({ length: 10 }, (_, i) => (i * 10).toString());
+    const decadeAges = decades.map(decade => {
+        const filteredResults = data.filter(item => item.Gender === gender && item.Year >= (1900 + parseInt(decade)) && item.Year < (1910 + parseInt(decade)));
+        const ages = filteredResults.map(item => item.Age);
+        const averageAge = ages.length > 0 ? ages.reduce((acc, age) => acc + age, 0) / ages.length : 0;
+        return averageAge;
+    });
+
     new Chart(canvas, {
-        type: 'bar',
+        type: 'line',
         data: {
-            labels: data.labels,
+            labels: decades,
             datasets: [{
-                label: data.datasets[0].label,
-                data: data.datasets[0].data,
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 1
+                label: gender,
+                data: decadeAges,
+                borderColor: gender === 'Male' ? 'rgba(255, 99, 132, 1)' : 'rgba(99, 132, 255, 1)',
+                fill: false,
             }]
         },
         options: {
             scales: {
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Década'
+                    }
+                },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Idade Média'
+                    }
                 }
             }
         }
@@ -32,30 +44,20 @@ function createChartFromCSV(canvas, data) {
 }
 
 // Função para ler dados CSV
-function readCSV(file, canvas) {
+function readCSV(file, canvas, gender) {
     Papa.parse(file, {
         header: true,
         dynamicTyping: true,
         complete: function (results) {
-            const labels = results.data.map(item => item.Year);
-            const data = results.data.map(item => item.Age);
-
-            createChartFromCSV(canvas, {
-                labels,
-                datasets: [{
-                    label: 'Idade dos Vencedores do Oscar',
-                    data
-                }]
-            });
+            createDecadeChart(canvas, results.data, gender);
         }
     });
 }
 
-// Carregando e criando gráficos para atores e atrizes
-fetch('./baseDados/oscar_age_male.csv') // Substitua pelo caminho correto para o arquivo CSV dos atores
+// Carregando e criando gráficos para atores e atrizes por década
+fetch('./baseDados/oscar_age.csv') // Substitua pelo caminho correto para o arquivo CSV
     .then(response => response.text())
-    .then(data => readCSV(data, actorsCanvas));
-
-fetch('./baseDados/oscar_age_female.csv') // Substitua pelo caminho correto para o arquivo CSV das atrizes
-    .then(response => response.text())
-    .then(data => readCSV(data, actressesCanvas));
+    .then(data => {
+        readCSV(data, actorsCanvas, 'Male'); // Gráfico de atores (homens)
+        readCSV(data, actressesCanvas, 'Female'); // Gráfico de atrizes (mulheres)
+    });
